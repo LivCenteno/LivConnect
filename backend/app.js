@@ -25,6 +25,9 @@ app.use((req, res, next) => {
   next();
 });
 
+const userRouter = require("./api/routers/userRouter");
+app.use("/user", userRouter);
+
 // ERROR MIDDLEWARE
 app.use((req, res, next) => {
   const error = new Error("Not Found");
