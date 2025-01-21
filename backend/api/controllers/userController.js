@@ -134,7 +134,9 @@ const updateUsername = async (req, res, next) => {
           message: `Username:${username} already exist`,
         });
       } else {
-        await knex("user").update({ username }).where({ id });
+        await knex("user")
+          .update({ username, updatedAt: knex.fn.now() })
+          .where({ id });
         return res.status(200).json({
           successful: true,
           message: "Successfully Updated Username",
@@ -149,8 +151,79 @@ const updateUsername = async (req, res, next) => {
   }
 };
 
+const changePassword = async (req, res, next) => {
+  try {
+    let id = req.params.id;
+    let password = req.body.password;
+    let newPassword = req.body.newPassword;
+    let confirmPassword = req.body.confirmPassword;
+
+    const validationError = util.changePassword(
+      id,
+      password,
+      newPassword,
+      confirmPassword
+    );
+
+    if (validationError) {
+      return res.status(400).json({
+        successful: false,
+        message: validationError,
+      });
+    } else {
+      let idExist = await knex("user").where({ id }).first();
+
+      if (!idExist) {
+        return res.status(400).json({
+          successful: false,
+          message: "Id does not Exist",
+        });
+      } else {
+        let oldPassword = idExist.password;
+
+        const isMatch = await bcrypt.compare(password, oldPassword);
+        const oldAndNewPasswordIsMatch = await bcrypt.compare(
+          newPassword,
+          oldPassword
+        );
+        if (!isMatch) {
+          return res.status(400).json({
+            successful: false,
+            message: "Old password is incorrect",
+          });
+        } else if (oldAndNewPasswordIsMatch) {
+          return res.status(400).json({
+            successful: false,
+            message: "New Password Cannot be the same as the Old Passowrd",
+          });
+        } else {
+          const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+          // Update the password in the database
+          await knex("user")
+            .update({
+              password: hashedNewPassword,
+              updatedAt: knex.fn.now(),
+            })
+            .where({ id });
+
+          return res.status(200).json({
+            successful: true,
+            message: "Password successfully updated",
+          });
+        }
+      }
+    }
+  } catch (err) {
+    return res.status(500).json({
+      successful: false,
+      message: err.message,
+    });
+  }
+};
 module.exports = {
   createUser,
   viewUserviaId,
   updateUsername,
+  changePassword,
 };

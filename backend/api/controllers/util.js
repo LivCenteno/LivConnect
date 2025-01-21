@@ -97,7 +97,20 @@ const updateEmail = (id, username) => {
 
   return null; // If all validations passed
 };
+
+const changePassword = (id, password, newPassword, confirmPassword) => {
+  if (!id || !password || !newPassword || !confirmPassword) {
+    return "One or more details are missing";
+  } else if (!checkPassword(newPassword)) {
+    return "Invalid password format. Password must contain at least one digit, one uppercase letter, one lowercase letter, one special character, and be at least 8 characters long.";
+  } else if (newPassword != confirmPassword) {
+    return "Password and confirm Password does not math";
+  }
+
+  return null;
+};
 module.exports = {
   checkUserInputs,
   updateEmail,
+  changePassword,
 };
