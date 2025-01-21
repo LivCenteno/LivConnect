@@ -43,6 +43,11 @@ const checkSuffix = (suffix) => {
   return regex.test(suffix);
 };
 
+const checkUsername = (username) => {
+  const regex = /^[a-zA-Z0-9._]+$/; // Only letters, numbers, periods, and underscores
+  return regex.test(username);
+};
+
 // Comprehensive input validation for createUser
 const checkUserInputs = (
   role,
@@ -70,6 +75,8 @@ const checkUserInputs = (
     return "Invalid email format";
   } else if (!checkPassword(password)) {
     return "Invalid password format. Password must contain at least one digit, one uppercase letter, one lowercase letter, one special character, and be at least 8 characters long.";
+  } else if (!checkUsername(username)) {
+    return "Usernames cannot include spaces. They can only contain letters, numbers, periods, and underscores";
   } else if (username.length > 30) {
     return "username's max is 30";
   } else if (password != confirmPassword) {
@@ -79,6 +86,18 @@ const checkUserInputs = (
   return null; // All validations passed
 };
 
+const updateEmail = (id, username) => {
+  if (!id || !username) {
+    return "Id or Username is Missing";
+  } else if (username.length > 30) {
+    return "Username's max is 30";
+  } else if (!checkUsername(username)) {
+    return "Usernames cannot include spaces. They can only contain letters, numbers, periods, and underscores";
+  }
+
+  return null; // If all validations passed
+};
 module.exports = {
   checkUserInputs,
+  updateEmail,
 };

@@ -107,7 +107,50 @@ const viewUserviaId = async (req, res, next) => {
   }
 };
 
+const updateUsername = async (req, res, next) => {
+  try {
+    let id = req.params.id;
+    let username = req.body.username;
+
+    const validationError = util.updateEmail(id, username);
+
+    if (validationError) {
+      return res.status(400).json({
+        successful: false,
+        message: validationError,
+      });
+    } else {
+      let idExist = await knex("user").where({ id }).first();
+      let usernameExist = await knex("user").where({ username }).first();
+
+      if (!idExist) {
+        return res.status(400).json({
+          successful: false,
+          message: "Id does not exist",
+        });
+      } else if (usernameExist) {
+        return res.status(400).json({
+          successful: false,
+          message: `Username:${username} already exist`,
+        });
+      } else {
+        await knex("user").update({ username }).where({ id });
+        return res.status(200).json({
+          successful: true,
+          message: "Successfully Updated Username",
+        });
+      }
+    }
+  } catch (err) {
+    return res.status(500).json({
+      successful: false,
+      message: err.message,
+    });
+  }
+};
+
 module.exports = {
   createUser,
   viewUserviaId,
+  updateUsername,
 };
