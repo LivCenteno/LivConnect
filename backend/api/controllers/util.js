@@ -52,6 +52,7 @@ const checkUserInputs = (
   suffix,
   email,
   password,
+  confirmPassword,
   username
 ) => {
   if (!checkRole(role)) {
@@ -71,6 +72,8 @@ const checkUserInputs = (
     return "Invalid password format. Password must contain at least one digit, one uppercase letter, one lowercase letter, one special character, and be at least 8 characters long.";
   } else if (username.length > 30) {
     return "username's max is 30";
+  } else if (password != confirmPassword) {
+    return "Password and Confirm Password does not match";
   }
 
   return null; // All validations passed

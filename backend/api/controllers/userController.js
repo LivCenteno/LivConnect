@@ -12,6 +12,7 @@ const createUser = async (req, res, next) => {
     let suffix = req.body.suffix;
     let email = req.body.email;
     let password = req.body.password;
+    let confirmPassword = req.body.confirmPassword;
     let username = req.body.username;
     let profilePicture = req.body.profilePicture;
 
@@ -23,6 +24,7 @@ const createUser = async (req, res, next) => {
       suffix,
       email,
       password,
+      confirmPassword,
       username
     );
 
@@ -71,6 +73,41 @@ const createUser = async (req, res, next) => {
   }
 };
 
+const viewUserviaId = async (req, res, next) => {
+  try {
+    let id = req.params.id;
+
+    if (!id) {
+      return res.status(404).json({
+        successful: false,
+        message: "Id is missing",
+      });
+    } else {
+      let idExist = await knex("user").where({ id }).first();
+
+      if (!idExist) {
+        return res.status(400).json({
+          successful: false,
+          message: "Id does not exist",
+        });
+      } else {
+        let userData = await knex("user").where({ id });
+        return res.status(200).json({
+          successful: true,
+          message: "Successfully Retrieved User Details",
+          data: userData,
+        });
+      }
+    }
+  } catch (err) {
+    return res.status(500).json({
+      successful: false,
+      message: err,
+    });
+  }
+};
+
 module.exports = {
   createUser,
+  viewUserviaId,
 };
