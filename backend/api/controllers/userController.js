@@ -73,6 +73,54 @@ const createUser = async (req, res, next) => {
   }
 };
 
+const login = async (req, res, next) => {
+  try {
+    let email = req.body.email;
+    let password = req.body.password;
+
+    const data = await knex("user")
+      .select(
+        "id",
+        "role",
+        "firstName",
+        "middleInitial",
+        "lastName",
+        "username",
+        "email",
+        "password"
+      )
+      .where({ email })
+      .first();
+
+    if (!data) {
+      return res.status(400).json({
+        successful: false,
+        message: "Invalid Credentials",
+      });
+    } else {
+      const isMatch = await bcrypt.compare(password, data.password);
+
+      if (!isMatch) {
+        return res.status(400).json({
+          successful: false,
+          message: "Invalid Credentials",
+        });
+      } else {
+        return res.status(200).json({
+          successful: true,
+          message: "Successfully Login",
+          data: data,
+        });
+      }
+    }
+  } catch (err) {
+    return res.status(500).json({
+      successful: false,
+      message: err.message,
+    });
+  }
+};
+
 const viewUserviaId = async (req, res, next) => {
   try {
     let id = req.params.id;
@@ -226,4 +274,5 @@ module.exports = {
   viewUserviaId,
   updateUsername,
   changePassword,
+  login,
 };
