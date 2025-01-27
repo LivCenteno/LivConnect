@@ -25,8 +25,10 @@ app.use((req, res, next) => {
   next();
 });
 
+const chatRouter = require("./api/routers/chatRouter");
 const userRouter = require("./api/routers/userRouter");
 app.use("/user", userRouter);
+app.use("/chat", chatRouter);
 
 // ERROR MIDDLEWARE
 app.use((req, res, next) => {
